@@ -30,4 +30,7 @@ https.get(url, res => {
 }).end()
 
 
-const value = "google.com"
+function getUrl() {
+  var url = document.getElementById("shortcodeUrl").value;
+  document.getElementById("demo").innerHTML = x;
+}

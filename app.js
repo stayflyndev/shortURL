@@ -1,32 +1,74 @@
-const https = require('https');
+//REWRITE USING EXPRESS JS 
+//https://expressjs.com/en/starter/hello-world.html
+const express = require('express');
+const app = express()
+const path = require('path');
+const port = 3000
+const fetch = require('node-fetch');
+const axios = require('axios')
+//You can use this to check if your server is working
+// app.get('/', (req, res)=>{
+//   res.send("Welcome to your server")
+//   })
+//body parser
+app.use(express.json());
+app.use(express.urlencoded(true));
 
-const hostname = '127.0.0.1';
-const port = 3000;
+// render the front end
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, './index.html'))
 
-const server = https.createServer((req, res) => {
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'text/plain');
-  res.end('Hello World');
+
+})
+
+
+
+
+//POST request to the input field
+app.post('/', (req, res) =>{
+  
+  const urlForShortcode = req.body.fullUrl
+  console.log("This is the url from the input:" + urlForShortcode)
+
+
+const apibaseUrl = `https://api.shrtco.de/v2/shorten`;
+
+const params = new URLSearchParams({url: urlForShortcode});
+console.log(params.toString())
+
+
+const urlQueryString = params.toString() // url=newUrl
+
+const shortCodeUrl = apibaseUrl + "?" + urlQueryString
+console.log("This is the:" + " " + shortCodeUrl)
+
+//takes the data and sends a request for this data (url)
+
+axios.get(shortCodeUrl)
+.then(response => {
+    console.log(response.data.result.short_link);
+    // console.log(response.data);
+    res.send(response.data.result.short_link);
+})
+.catch(error => {
+    console.log(error);
 });
 
-server.listen(port, hostname, () => {
-  console.log(`Server running at https://${hostname}:${port}/`);
-});
-
-const url = 'https://api.shrtco.de/v2/shorten?url=google.com';
+})
 
 
-https.get(url, res => {
-  let data = '';
-  res.on('data', chunk => {
-    data += chunk;
-  });
-  res.on('end', () => {
-    data = JSON.parse(data);
-    console.log(data.result.short_link);
-  })
-}).on('error', err => {
-  console.log(err.message);
-}).end()
+
+app.listen(port, () => {
+  console.log(`Example app listening at http://localhost:${port}`)
+})
 
 
+
+
+
+function getUrl() {
+  const inputValue = document.getElementById('shortcodeUrl').value
+  document.getElementById("displayUrl").innerHTML = inputValue
+
+  console.log(inputValue)
+}
